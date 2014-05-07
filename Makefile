@@ -4,9 +4,12 @@
 
 # CC
 CC=gcc
+#指定到gcc编译程序
 # Path to parent kernel include files directory
+#包含文件目录的母核路径
 LIBC_INCLUDE=/usr/include
 # Libraries
+#添加库
 ADDLIB=
 # Linker flags
 LDFLAG_STATIC=-Wl,-Bstatic

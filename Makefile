@@ -173,34 +173,43 @@ DEF_arping = $(DEF_SYSFS) $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS)
 LIB_arping = $(LIB_SYSFS) $(LIB_CAP) $(LIB_IDN)
 
 ifneq ($(ARPING_DEFAULT_DEVICE),)
+#开始条件语句
 DEF_arping += -DDEFAULT_DEVICE=\"$(ARPING_DEFAULT_DEVICE)\"
+#继续进行追加
+#$(ARPING_DEFAULT_DEVICE)后存在结尾空格，会被作为makefile需要执行的一部分。
 endif
 
+#iputtils软件包是网络工具的集合；内含工具clockdiff ping  ping6
 # clockdiff
+#计算目的主机和本地主机的时差
 DEF_clockdiff = $(DEF_CAP)
 LIB_clockdiff = $(LIB_CAP)
 
 # ping / ping6
+#测试计算机名称、IP 并检验与远程PC的连接
 DEF_ping_common = $(DEF_CAP) $(DEF_IDN)
 DEF_ping  = $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS)
 LIB_ping  = $(LIB_CAP) $(LIB_IDN)
 DEF_ping6 = $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS) $(DEF_ENABLE_PING6_RTHDR) $(DEF_CRYPTO)
 LIB_ping6 = $(LIB_CAP) $(LIB_IDN) $(LIB_RESOLV) $(LIB_CRYPTO)
-
+#ping程序由ping.c ping6.cping_common.c ping.h 文件构成 
 ping: ping_common.o
 ping6: ping_common.o
 ping.o ping_common.o: ping_common.h
 ping6.o: ping_common.h in6_flowlabel.h
 
 # rarpd
+#rdisc.c文件组成rdisc   为逆地址解析协议的服务端程序
 DEF_rarpd =
 LIB_rarpd =
 
 # rdisc
 DEF_rdisc = $(DEF_ENABLE_RDISC_SERVER)
 LIB_rdisc =
+#搜索守护程序
 
 # tracepath
+#测试IP数据报文从源主机传道目的主机的路由
 DEF_tracepath = $(DEF_IDN)
 LIB_tracepath = $(LIB_IDN)
 
@@ -213,18 +222,24 @@ DEF_traceroute6 = $(DEF_CAP) $(DEF_IDN)
 LIB_traceroute6 = $(LIB_CAP) $(LIB_IDN)
 
 # tftpd
+#tftp协议的服务端程序可简单文件传送
 DEF_tftpd =
 DEF_tftpsubs =
 LIB_tftpd =
 
 tftpd: tftpsubs.o
 tftpd.o tftpsubs.o: tftp.h
+#tftpd.o tftpsubs.o文件   依赖于tftp.h头文件
+
 
 # -------------------------------------
 # ninfod
+#可执行文件ninfod生成
 ninfod:
 	@set -e; \
+	#确保目录下存在Makefile，若无创建一个
 		if [ ! -f ninfod/Makefile ]; then \
+		#
 			cd ninfod; \
 			./configure; \
 			cd ..; \

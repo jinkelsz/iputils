@@ -239,41 +239,54 @@ ninfod:
 	@set -e; \
 	#确保目录下存在Makefile，若无创建一个
 		if [ ! -f ninfod/Makefile ]; then \
-		#
+		#压缩与解压缩
 			cd ninfod; \
 			./configure; \
 			cd ..; \
 		fi; \
-		$(MAKE) -C ninfod
+		#fi为if语句的结束
+		$(MAKE) -C ninfod  
+		#else 为ninfod读取Makefile的路径
 
 # -------------------------------------
+#内核检查
 # modules / check-kernel are only for ancient kernels; obsolete
+#标记不再使用的实体，并提示警告
 check-kernel:
 ifeq ($(KERNEL_INCLUDE),)
 	@echo "Please, set correct KERNEL_INCLUDE"; false
+	#取消echo显示
 else
-	@set -e; \
+	@set -e; \    
+	#特殊处理以下字符
 	if [ ! -r $(KERNEL_INCLUDE)/linux/autoconf.h ]; then \
+	#autoconf.h为一般文件，否则报错
 		echo "Please, set correct KERNEL_INCLUDE"; false; fi
 endif
 
 modules: check-kernel
 	$(MAKE) KERNEL_INCLUDE=$(KERNEL_INCLUDE) -C Modules
+	#用modules中的makefile文件编译文档
 
 # -------------------------------------
 man:
 	$(MAKE) -C doc man
+	#man帮助文档生成
 
 html:
 	$(MAKE) -C doc html
 
 clean:
 	@rm -f *.o $(TARGETS)
+	#删除生成的所有的目标二进制文件
 	@$(MAKE) -C Modules clean
+	#执行clean 删除指定文件
 	@$(MAKE) -C doc clean
 	@set -e; \
 		if [ -f ninfod/Makefile ]; then \
+		#在ninfod下有makefile文件进行读取
 			$(MAKE) -C ninfod clean; \
+			#清除编译的执行文件和配置文件
 		fi
 
 distclean: clean
@@ -285,8 +298,11 @@ distclean: clean
 # -------------------------------------
 snapshot:
 	@if [ x"$(UNAME_N)" != x"pleiades" ]; then echo "Not authorized to advance snapshot"; exit 1; fi
+	#如果两文件的十六进制不同，提示并退出
 	@echo "[$(TAG)]" > RELNOTES.NEW
+	#变量的内容覆盖定向
 	@echo >>RELNOTES.NEW
+	#重定向
 	@git log --no-merges $(LASTTAG).. | git shortlog >> RELNOTES.NEW
 	@echo >> RELNOTES.NEW
 	@cat RELNOTES >> RELNOTES.NEW
@@ -294,9 +310,14 @@ snapshot:
 	@sed -e "s/^%define ssdate .*/%define ssdate $(DATE)/" iputils.spec > iputils.spec.tmp
 	@mv iputils.spec.tmp iputils.spec
 	@echo "static char SNAPSHOT[] = \"$(TAG)\";" > SNAPSHOT.h
+	#将TAG变量中的内容以"static char SNAPSHOT[] = \"$(TAG)\"的形式重定向到SNAPSHOT.h文档中
 	@$(MAKE) -C doc snapshot
+	#doc文档生成
 	@$(MAKE) man
 	@git commit -a -m "iputils-$(TAG)"
+	#提交修改
 	@git tag -s -m "iputils-$(TAG)" $(TAG)
+	#利用私钥进行署名
 	@git archive --format=tar --prefix=iputils-$(TAG)/ $(TAG) | bzip2 -9 > ../iputils-$(TAG).tar.bz2
+	
 

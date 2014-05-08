@@ -66,15 +66,20 @@ ENABLE_RDISC_SERVER=no
 # What a pity, all new gccs are buggy and -Werror does not work. Sigh.
 # CCOPT=-fno-strict-aliasing -Wstrict-prototypes -Wall -Werror -g
 CCOPT=-fno-strict-aliasing -Wstrict-prototypes -Wall -g
+#-Wstrict-prototypes: 如果函数的声明或定义没有指出参数类型，编译器报警告
 CCOPTOPT=-O3
+#优化等级 ——3
+#assert（）所有信息关闭
 GLIBCFIX=-D_GNU_SOURCE
 DEFINES=
 LDLIB=
 
 FUNC_LIB = $(if $(filter static,$(1)),$(LDFLAG_STATIC) $(2) $(LDFLAG_DYNAMIC),$(2))
 
+#确定每个函数库中是否有重复函数
 # USE_GNUTLS: DEF_GNUTLS, LIB_GNUTLS
 # USE_CRYPTO: LIB_CRYPTO
+#确定crypto加密解密函数库的函数是否重复
 ifneq ($(USE_GNUTLS),no)
 	LIB_CRYPTO = $(call FUNC_LIB,$(USE_GNUTLS),$(LDFLAG_GNUTLS))
 	DEF_CRYPTO = -DUSE_GNUTLS
@@ -83,15 +88,18 @@ else
 endif
 
 # USE_RESOLV: LIB_RESOLV
+#确定resolv加密解密函数库的函数是否重复
 LIB_RESOLV = $(call FUNC_LIB,$(USE_RESOLV),$(LDFLAG_RESOLV))
 
 # USE_CAP:  DEF_CAP, LIB_CAP
+#判断CAP函数库中的函数是否重复
 ifneq ($(USE_CAP),no)
 	DEF_CAP = -DCAPABILITIES
 	LIB_CAP = $(call FUNC_LIB,$(USE_CAP),$(LDFLAG_CAP))
 endif
 
 # USE_SYSFS: DEF_SYSFS, LIB_SYSFS
+#判断接口函数库SYSFS是否重复
 ifneq ($(USE_SYSFS),no)
 	DEF_SYSFS = -DUSE_SYSFS
 	LIB_SYSFS = $(call FUNC_LIB,$(USE_SYSFS),$(LDFLAG_SYSFS))

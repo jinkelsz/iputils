@@ -6,14 +6,19 @@
 CC=gcc
 #指定到gcc编译程序
 # Path to parent kernel include files directory
-#包含文件目录的母核路径
+#包含文件目录的父路径
 LIBC_INCLUDE=/usr/include
 # Libraries
 #添加库
 ADDLIB=
 # Linker flags
+#wlz作用是将之后的参数传给编译器
 LDFLAG_STATIC=-Wl,-Bstatic
+#-Wl,-Bstatic告诉链接器使用-Bstatic选项，该选项是告诉链接器，对接下来的-l选项使用静态链接
 LDFLAG_DYNAMIC=-Wl,-Bdynamic
+#告诉链接器对接下来的-l选项使用动态链接
+#加载库
+#加载载cap函数库、TLS加密函数库、crypto加密解密函数库、idn恒等函数库、resolv函数库、sysfs接口函数库
 LDFLAG_CAP=-lcap
 LDFLAG_GNUTLS=-lgnutls-openssl
 LDFLAG_CRYPTO=-lcrypto
@@ -24,29 +29,37 @@ LDFLAG_SYSFS=-lsysfs
 #
 # Options
 #
-
+#变量定义，设置开关
 # Capability support (with libcap) [yes|static|no]
+#用libcap表示cap函数的支持
 USE_CAP=yes
+#初始化文件系统
+#函数库的支持、表示方式及状态
 # sysfs support (with libsysfs - deprecated) [no|yes|static]
 USE_SYSFS=no
 # IDN support (experimental) [no|yes|static]
 USE_IDN=no
-
+#第一个为默认状态
+#并且默认不使用函数gentifaddrs获得接口信息
 # Do not use getifaddrs [no|yes|static]
 WITHOUT_IFADDRS=no
+#默认的设备：无线、网卡等
 # arping default device (e.g. eth0) []
 ARPING_DEFAULT_DEVICE=
-
+#GNU TLS库ping6的默认状态为：是
 # GNU TLS library for ping6 [yes|no|static]
 USE_GNUTLS=yes
 # Crypto library for ping6 [shared|static]
+#加密解密库为默认共享
 USE_CRYPTO=shared
 # Resolv library for ping6 [yes|static]
 USE_RESOLV=yes
 # ping6 source routing (deprecated by RFC5095) [no|yes|RFC3542]
+#ping6源不使用REC5095 状态：无
 ENABLE_PING6_RTHDR=no
 
 # rdisc server (-r option) support [no|yes]
+#rdisc服务器默认不支持 -r 选项
 ENABLE_RDISC_SERVER=no
 
 # -------------------------------------

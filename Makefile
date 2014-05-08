@@ -106,12 +106,14 @@ ifneq ($(USE_SYSFS),no)
 endif
 
 # USE_IDN: DEF_IDN, LIB_IDN
+#判断IDN恒等函数库中的函数是否重复
 ifneq ($(USE_IDN),no)
 	DEF_IDN = -DUSE_IDN
 	LIB_IDN = $(call FUNC_LIB,$(USE_IDN),$(LDFLAG_IDN))
 endif
 
 # WITHOUT_IFADDRS: DEF_WITHOUT_IFADDRS
+#观察是否使用IFADDRS。若使用禁用
 ifneq ($(WITHOUT_IFADDRS),no)
 	DEF_WITHOUT_IFADDRS = -DWITHOUT_IFADDRS
 endif
@@ -122,8 +124,10 @@ ifneq ($(ENABLE_RDISC_SERVER),no)
 endif
 
 # ENABLE_PING6_RTHDR: DEF_ENABLE_PING6_RTHDR
+#ping6失能原路由
 ifneq ($(ENABLE_PING6_RTHDR),no)
 	DEF_ENABLE_PING6_RTHDR = -DPING6_ENABLE_RTHDR
+#禁止使用rfc3542
 ifeq ($(ENABLE_PING6_RTHDR),RFC3542)
 	DEF_ENABLE_PING6_RTHDR += -DPINR6_ENABLE_RTHDR_RFC3542
 endif
@@ -139,25 +143,32 @@ LDLIBS=$(LDLIB) $(ADDLIB)
 
 UNAME_N:=$(shell uname -n)
 LASTTAG:=$(shell git describe HEAD | sed -e 's/-.*//')
+#日期、使用时间  年/月/日
 TODAY=$(shell date +%Y/%m/%d)
 DATE=$(shell date --date $(TODAY) +%Y%m%d)
 TAG:=$(shell date --date=$(TODAY) +s%Y%m%d)
 
 
 # -------------------------------------
+#查内核模块在编译过程中产生的中间文件并加以清除
 .PHONY: all ninfod clean distclean man html check-kernel modules snapshot
-
+#伪代码 使用 make +名称
 all: $(TARGETS)
 
 %.s: %.c
 	$(COMPILE.c) $< $(DEF_$(patsubst %.o,%,$@)) -S -o $@
+#生成目标文件  $< 依赖目标中的第一个目标名字  $@ 表示目标
 %.o: %.c
 	$(COMPILE.c) $< $(DEF_$(patsubst %.o,%,$@)) -o $@
 $(TARGETS): %: %.o
 	$(LINK.o) $^ $(LIB_$@) $(LDLIBS) -o $@
+#$^ 所有的依赖目标的集合 
 
+## 在$(patsubst %.o,%,$@ )中，patsubst把目标中的变量符合后缀是.o的全部删除,  DEF_ping
+# LINK.o把.o文件链接在一起的命令行,缺省值是$(CC) $(LDFLAGS) $(TARGET_ARCH)
 # -------------------------------------
 # arping
+#给相邻主机发ARP请求
 DEF_arping = $(DEF_SYSFS) $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS)
 LIB_arping = $(LIB_SYSFS) $(LIB_CAP) $(LIB_IDN)
 
